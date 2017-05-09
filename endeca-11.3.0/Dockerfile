@@ -53,12 +53,13 @@ RUN mkdir -p $SCRIPT_DIR
 #######################################
 # Copy script that creates unique password for root and other scripts
 ADD $LOCAL_SCRIPTS/*.sh $SCRIPT_DIR/
-RUN chmod -R 755 $SCRIPT_DIR
-RUN chmod +x $SCRIPT_DIR/*.sh
+RUN chmod -R 755 $SCRIPT_DIR && \
+    chmod +x $SCRIPT_DIR/*.sh
 
 #######################################
 #Run commands to create endeca user and modify sudoers
-RUN $SCRIPT_DIR/create-endeca-user.sh
+RUN useradd -m -d /home/endeca endeca
+USER endeca
 
 #######################################
 # start copying across all endeca packages
@@ -86,7 +87,6 @@ RUN unzip $BASE_TMP_PACKAGE_INSTALL/V861206-01.zip -d $BASE_TMP_ENDECA_INSTALL &
 RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
 RUN chmod +x $BASE_TMP_ENDECA_INSTALL/*.bin
-RUN chown -R endeca $BASE_TMP_ENDECA_INSTALL
 
 #######################################
 # MDEX INSTALLATION FOLLOWS
@@ -107,13 +107,13 @@ ENV PATH $ENDECA_MDEX_ROOT/bin:$PATH
 
 #create silent install text file
 ENV PS_SILENT_PATH $BASE_TMP_ENDECA_INSTALL/ps_response.properties
-RUN echo INSTALLDIR=$BASE_ENDECA_DIR/PlatformServices > $PS_SILENT_PATH && \
+RUN echo INSTALL_DIR=$BASE_ENDECA_DIR/PlatformServices > $PS_SILENT_PATH && \
     echo ETOOLS_HTTP_PORT=$ENDECA_HTTP_SERVICE_PORT >> $PS_SILENT_PATH && \
     echo ETOOLS_SERVER_PORT=$ENDECA_HTTP_SERVICE_SHUTDOWN_PORT >> $PS_SILENT_PATH && \
     echo EAC_MDEX_ROOT=$ENDECA_MDEX_INSTALL_DIR >> $PS_SILENT_PATH
 
 # install platform services
-RUN $BASE_TMP_ENDECA_INSTALL/OCplatformservices11.3.0-Linux64.bin -i --silent -f $PS_SILENT_PATH
+RUN $BASE_TMP_ENDECA_INSTALL/OCplatformservices11.3.0-Linux64.bin -i silent -f ps_response.properties
 
 RUN cat $BASE_ENDECA_DIR/PlatformServices/workspace/setup/installer_sh.ini >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
@@ -165,8 +165,8 @@ RUN mkdir $BASE_ENDECA_DIR/apps
 
 #######################################
 # set user and permissions to endeca
-RUN chown -R endeca.endeca $BASE_ENDECA_DIR/
-RUN chmod -R 755 $BASE_ENDECA_DIR/
+RUN chown -R endeca $BASE_ENDECA_DIR && \
+    chmod -R 755 $BASE_ENDECA_DIR/
 
 #######################################
 # install is done start cleanup to remove initial packages
