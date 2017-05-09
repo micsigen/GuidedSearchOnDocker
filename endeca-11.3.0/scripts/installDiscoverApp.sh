@@ -3,13 +3,13 @@
 # Install Discover App with some tweaks
 #
 
-INTERNAL_IP=192.168.59.103
+INTERNAL_IP=127.0.0.1
 
 # deploy app
-/appl/endeca/ToolsAndFrameworks/3.1.1/deployment_template/bin/deploy.sh --app /appl/endeca/ToolsAndFrameworks/3.1.1/reference/discover-data/deploy.xml
+/home/endeca/endeca/ToolsAndFrameworks/11.3.0/deployment_template/bin/deploy.sh --app /appl/endeca/ToolsAndFrameworks/11.3.0/reference/discover-data/deploy.xml
 
 # change logging level to see everything
-sed -i 's/\(INFO\|WARNING\|CONFIG\)/ALL/g' /appl/endeca/apps/Discover/config/script/logging.properties
+sed -i 's/\(INFO\|WARNING\|CONFIG\)/ALL/g' /home/endeca/endeca/apps/Discover/config/script/logging.properties
 
 
 # change host to IP address

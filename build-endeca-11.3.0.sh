@@ -2,9 +2,9 @@
 
 set -o pipefail
 
-FILE=endeca-3.1.2
-IMAGE=ets04uga/endeca
-VERSION=3.1.2
+FILE=endeca-11.3.0
+IMAGE=micsigen/endeca
+VERSION=11.3.0
 
 docker build -t ${IMAGE}:${VERSION} $FILE | tee build.log || exit 1
 ID=$(tail -1 build.log | awk '{print $3;}')
