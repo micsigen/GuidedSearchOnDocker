@@ -133,7 +133,7 @@ ENV TF_SILENT_SH_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_install.s
 ENV TF_SILENT_RESP_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp
 
 RUN sed -i 's/dba/root/g' $TF_SILENT_RESP_PATH
-RUN $TF_SILENT_SH_PATH $TF_SILENT_RESP_PATH ToolsAndFrameworks $ENDECA_TOOLS_ROOT
+RUN $TF_SILENT_SH_PATH $TF_SILENT_RESP_PATH ToolsAndFrameworks $BASE_ENDECA_DIR/ToolsAndFrameworks
 
 RUN echo ENDECA_TOOLS_ROOT=$ENDECA_TOOLS_ROOT >> $USER_HOME_DIR/.bashrc
 RUN echo ENDECA_TOOLS_CONF=$ENDECA_TOOLS_CONF >> $USER_HOME_DIR/.bashrc
@@ -162,13 +162,9 @@ RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64.bin -i silent -f $BASE_TMP_ENDE
 RUN mkdir $BASE_ENDECA_DIR/apps
 
 #######################################
-# set user and permissions to endeca
-RUN chmod -R 755 $BASE_ENDECA_DIR/
-
-#######################################
 # install is done start cleanup to remove initial packages
-# RUN rm -rf $BASE_TMP_ENDECA_INSTALL
-# RUN rm /setup*.sh
+RUN rm -rf $BASE_TMP_ENDECA_INSTALL
+RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
 USER root
 ENV AUTHORIZED_KEYS **None**
