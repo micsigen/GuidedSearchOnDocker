@@ -8,15 +8,10 @@ RUN yum -y install which && \
     yum -y install glibc.i686 && \
     yum -y install sudo && \
     yum -y install tar && \
-    yum -y install unzip.x86_64 && \
-    yum -y install gawk
+    yum -y install unzip.x86_64
 
 #######################################
 # environment variables
-
-# user information
-ENV USER endeca
-ENV USER_HOME_DIR /home/$USER
 
 # environment variable for local location
 ENV LOCAL_SCRIPTS scripts
@@ -29,7 +24,7 @@ ENV BASE_TMP_PACKAGE_INSTALL $BASE_TMP_ENDECA_INSTALL/packages
 ENV SCRIPT_DIR $BASE_TMP_ENDECA_INSTALL/bin
 
 # environment variables for endeca location
-# /home/endeca/endeca
+ENV USER_HOME_DIR /home/endeca
 ENV BASE_ENDECA_DIR $USER_HOME_DIR/endeca
 
 # platform services silent install specific env variables
@@ -41,6 +36,8 @@ ENV ENDECA_MDEX_INSTALL_DIR $BASE_ENDECA_DIR/MDEX/11.3.0
 ENV CAS_PORT 8500
 ENV CAS_SHUTDOWN_PORT 8506
 ENV CAS_HOST localhost
+
+RUN useradd -m -d /home/endeca endeca -G root -p endeca
 
 #######################################
 # create directories for copying initial endeca packages
@@ -55,11 +52,6 @@ RUN mkdir -p $SCRIPT_DIR
 ADD $LOCAL_SCRIPTS/*.sh $SCRIPT_DIR/
 RUN chmod -R 755 $SCRIPT_DIR && \
     chmod +x $SCRIPT_DIR/*.sh
-
-#######################################
-#Run commands to create endeca user and modify sudoers
-RUN useradd -m -d /home/endeca endeca
-USER endeca
 
 #######################################
 # start copying across all endeca packages
@@ -77,14 +69,15 @@ ADD $LOCAL_TOOLS/V861200-01.zip $BASE_TMP_PACKAGE_INSTALL/V861200-01.zip
 #OCcas11.3.0-Linux64.bin
 ADD $LOCAL_TOOLS/V861198-01.zip $BASE_TMP_PACKAGE_INSTALL/V861198-01.zip
 
+RUN chown -R endeca $BASE_TMP_ENDECA_INSTALL
+
+USER endeca
 #######################################
 # Unzip all packages to get install scripts and files
 RUN unzip $BASE_TMP_PACKAGE_INSTALL/V861206-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
     unzip $BASE_TMP_PACKAGE_INSTALL/V861203-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
     unzip $BASE_TMP_PACKAGE_INSTALL/V861200-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
     unzip $BASE_TMP_PACKAGE_INSTALL/V861198-01.zip -d $BASE_TMP_ENDECA_INSTALL
-
-RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
 RUN chmod +x $BASE_TMP_ENDECA_INSTALL/*.bin
 
@@ -107,7 +100,7 @@ ENV PATH $ENDECA_MDEX_ROOT/bin:$PATH
 
 #create silent install text file
 ENV PS_SILENT_PATH $BASE_TMP_ENDECA_INSTALL/ps_response.properties
-RUN echo INSTALL_DIR=$BASE_ENDECA_DIR/PlatformServices > $PS_SILENT_PATH && \
+RUN echo INSTALLDIR=$BASE_ENDECA_DIR/PlatformServices > $PS_SILENT_PATH && \
     echo ETOOLS_HTTP_PORT=$ENDECA_HTTP_SERVICE_PORT >> $PS_SILENT_PATH && \
     echo ETOOLS_SERVER_PORT=$ENDECA_HTTP_SERVICE_SHUTDOWN_PORT >> $PS_SILENT_PATH && \
     echo EAC_MDEX_ROOT=$ENDECA_MDEX_INSTALL_DIR >> $PS_SILENT_PATH
@@ -115,9 +108,9 @@ RUN echo INSTALL_DIR=$BASE_ENDECA_DIR/PlatformServices > $PS_SILENT_PATH && \
 # install platform services
 RUN $BASE_TMP_ENDECA_INSTALL/OCplatformservices11.3.0-Linux64.bin -i silent -f ps_response.properties
 
+# RUN ln -s $USER_HOME_DIR/endeca/PlatformServices/ $BASE_ENDECA_DIR/PlatformServices
 RUN cat $BASE_ENDECA_DIR/PlatformServices/workspace/setup/installer_sh.ini >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
-
 
 # set platform services variables for rest of install
 ENV VERSION 11.3.0
@@ -139,25 +132,30 @@ ENV ENDECA_TOOLS_CONF $BASE_ENDECA_DIR/ToolsAndFrameworks/11.3.0/server/workspac
 ENV TF_SILENT_SH_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_install.sh
 ENV TF_SILENT_RESP_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp
 
+RUN sed -i 's/dba/root/g' $TF_SILENT_RESP_PATH
 RUN $TF_SILENT_SH_PATH $TF_SILENT_RESP_PATH ToolsAndFrameworks $ENDECA_TOOLS_ROOT
 
 RUN echo ENDECA_TOOLS_ROOT=$ENDECA_TOOLS_ROOT >> $USER_HOME_DIR/.bashrc
 RUN echo ENDECA_TOOLS_CONF=$ENDECA_TOOLS_CONF >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
 
+USER root
+RUN /home/endeca/oraInventory/orainstRoot.sh
+
 #######################################
 # CAS INSTALLATION FOLLOWS
 
 #create silent install text file
+USER endeca
 RUN echo INSTALLDIR=$BASE_ENDECA_DIR/CAS/11.3.0 > $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
-    echo CASPORT=$CAS_PORT > $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \    
+    echo CASPORT=$CAS_PORT >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \    
     echo CASSHUTDOWNPORT=$CAS_SHUTDOWN_PORT >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
-    echo CASHOST=$CAS_HOST > $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
+    echo CASHOST=$CAS_HOST >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
     echo ENDECA_TOOLS_ROOT=$ENDECA_TOOLS_ROOT >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
     echo ENDECA_TOOLS_CONF=$ENDECA_TOOLS_CONF >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
 
 #install CAS
-RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64 -i silent -f $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
+RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64.bin -i silent -f $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
 
 #######################################
 # create apps directory
@@ -165,15 +163,16 @@ RUN mkdir $BASE_ENDECA_DIR/apps
 
 #######################################
 # set user and permissions to endeca
-RUN chown -R endeca $BASE_ENDECA_DIR && \
-    chmod -R 755 $BASE_ENDECA_DIR/
+RUN chmod -R 755 $BASE_ENDECA_DIR/
 
 #######################################
 # install is done start cleanup to remove initial packages
 # RUN rm -rf $BASE_TMP_ENDECA_INSTALL
 # RUN rm /setup*.sh
 
+USER root
 ENV AUTHORIZED_KEYS **None**
 
-EXPOSE 22
+EXPOSE 22 $CAS_PORT $ENDECA_HTTP_SERVICE_PORT
+VOLUME ["$BASE_ENDECA_DIR"]
 CMD ["/run.sh"]
