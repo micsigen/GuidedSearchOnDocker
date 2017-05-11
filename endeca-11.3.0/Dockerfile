@@ -37,6 +37,8 @@ ENV CAS_PORT 8500
 ENV CAS_SHUTDOWN_PORT 8506
 ENV CAS_HOST localhost
 
+ENV WORKBENCH_PORT 8006
+
 RUN useradd -m -d /home/endeca endeca -G root -p endeca
 
 #######################################
@@ -155,20 +157,35 @@ RUN echo INSTALLDIR=$BASE_ENDECA_DIR/CAS/11.3.0 > $BASE_TMP_ENDECA_INSTALL/cas-s
     echo ENDECA_TOOLS_CONF=$ENDECA_TOOLS_CONF >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
 
 #install CAS
-RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64.bin -i silent -f $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
+RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64.bin -i silent -f cas-silent.txt
+
+RUN echo CAS_ROOT=$BASE_ENDECA_DIR/CAS/11.3.0
+RUN echo CAS_WORKSPACE=$BASE_ENDECA_DIR/CAS/workspace
+RUN source $USER_HOME_DIR/.bashrc >> $USER_HOME_DIR/.bashrc
 
 #######################################
 # create apps directory
 RUN mkdir $BASE_ENDECA_DIR/apps
+RUN mkdir $USER_HOME_DIR/bin
+RUN mkdir $USER_HOME_DIR/conf
+
+RUN mv $SCRIPT_DIR/*.sh $USER_HOME_DIR/bin
+RUN sed -i 's/-DSTOP.PORT=/-DSTOP.PORT=8506/g' $BASE_ENDECA_DIR/CAS/11.3.0/bin/cas-service.sh
+
+RUN cp $BASE_TMP_ENDECA_INSTALL/cas-silent.txt $USER_HOME_DIR/conf/ && \
+    cp $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp $USER_HOME_DIR/conf/ && \
+    cp $PS_SILENT_PATH $USER_HOME_DIR/conf/
+
+USER root
+RUN cp $USER_HOME_DIR/bin/start_services.sh /
 
 #######################################
 # install is done start cleanup to remove initial packages
 RUN rm -rf $BASE_TMP_ENDECA_INSTALL
 RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
-USER root
 ENV AUTHORIZED_KEYS **None**
 
-EXPOSE 22 $CAS_PORT $ENDECA_HTTP_SERVICE_PORT
-VOLUME ["$BASE_ENDECA_DIR"]
+VOLUME ["/home/endeca/endeca/apps"]
+EXPOSE 22 $CAS_PORT $WORKBENCH_PORT
 CMD ["/run.sh"]
