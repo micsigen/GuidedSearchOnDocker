@@ -177,7 +177,6 @@ RUN cp $BASE_TMP_ENDECA_INSTALL/cas-silent.txt $USER_HOME_DIR/conf/ && \
     cp $PS_SILENT_PATH $USER_HOME_DIR/conf/
 
 USER root
-RUN cp $USER_HOME_DIR/bin/start_services.sh /
 
 #######################################
 # install is done start cleanup to remove initial packages
