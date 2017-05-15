@@ -159,9 +159,9 @@ RUN echo INSTALLDIR=$BASE_ENDECA_DIR/CAS/11.3.0 > $BASE_TMP_ENDECA_INSTALL/cas-s
 #install CAS
 RUN $BASE_TMP_ENDECA_INSTALL/OCcas11.3.0-Linux64.bin -i silent -f cas-silent.txt
 
-RUN echo CAS_ROOT=$BASE_ENDECA_DIR/CAS/11.3.0
-RUN echo CAS_WORKSPACE=$BASE_ENDECA_DIR/CAS/workspace
-RUN source $USER_HOME_DIR/.bashrc >> $USER_HOME_DIR/.bashrc
+RUN echo CAS_ROOT=$BASE_ENDECA_DIR/CAS/11.3.0 >> $USER_HOME_DIR/.bashrc
+RUN echo CAS_WORKSPACE=$BASE_ENDECA_DIR/CAS/workspace >> $USER_HOME_DIR/.bashrc
+RUN source $USER_HOME_DIR/.bashrc
 
 #######################################
 # create apps directory
@@ -175,6 +175,11 @@ RUN sed -i 's/-DSTOP.PORT=/-DSTOP.PORT=8506/g' $BASE_ENDECA_DIR/CAS/11.3.0/bin/c
 RUN cp $BASE_TMP_ENDECA_INSTALL/cas-silent.txt $USER_HOME_DIR/conf/ && \
     cp $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp $USER_HOME_DIR/conf/ && \
     cp $PS_SILENT_PATH $USER_HOME_DIR/conf/
+
+# set remaining environment variables
+RUN echo ENDECA_USER=endeca >> $USER_HOME_DIR/.bashrc && \
+    echo JAVA_HOME=/home/endeca/endeca/ToolsAndFrameworks/11.3.0/server/jdk1.8.0_121 && \
+RUN source $USER_HOME_DIR/.bashrc
 
 USER root
 
