@@ -178,7 +178,7 @@ RUN cp $BASE_TMP_ENDECA_INSTALL/cas-silent.txt $USER_HOME_DIR/conf/ && \
 
 # set remaining environment variables
 RUN echo ENDECA_USER=endeca >> $USER_HOME_DIR/.bashrc && \
-    echo JAVA_HOME=/home/endeca/endeca/ToolsAndFrameworks/11.3.0/server/jdk1.8.0_121 && \
+    echo JAVA_HOME=/home/endeca/endeca/ToolsAndFrameworks/11.3.0/server/jdk1.8.0_121 >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
 
 USER root

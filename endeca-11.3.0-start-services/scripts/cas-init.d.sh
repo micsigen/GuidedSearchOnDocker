@@ -24,9 +24,12 @@ case "${1}" in
     /bin/su $ENDECA_USER -c "$CAS_ROOT/bin/cas-service.sh &"
     ;;
   stop)
-    /bin/su $ENDECA_USER -c "$CAS_ROOT/bin/cas-service-shutdown.sh"
+    /bin/su $ENDECA_USER -c "$CAS_ROOT/bin/cas-service-shutdown.sh &"
     ;;
   *)
     usage
     exit 2
 esac
+
+
+# change to user endeca

@@ -5,6 +5,9 @@
 # chkconfig: 35 95 20
 # description: Oracle Endeca Tools Service (Workbench)
 
+ENDECA_USER=endeca
+ENDECA_TOOLS_ROOT=/home/endeca/endeca/ToolsAndFrameworks/11.3.0
+
 usage() {
   echo "Usage: ${0} (start|stop)"
   echo ""

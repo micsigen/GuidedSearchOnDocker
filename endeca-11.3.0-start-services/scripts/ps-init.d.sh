@@ -5,6 +5,12 @@
 # chkconfig: 35 95 20
 # description: Platform Services
 
+ENDECA_USER=endeca
+ENDECA_ROOT="/home/endeca/endeca/PlatformServices/11.3.0"
+export ENDECA_ROOT
+ENDECA_CONF="/home/endeca/endeca/PlatformServices/workspace"
+export ENDECA_CONF
+
 usage() {
   echo "Usage: ${0} (start|stop)"
   echo ""
