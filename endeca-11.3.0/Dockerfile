@@ -168,6 +168,7 @@ RUN source $USER_HOME_DIR/.bashrc
 RUN mkdir $BASE_ENDECA_DIR/apps
 RUN mkdir $USER_HOME_DIR/bin
 RUN mkdir $USER_HOME_DIR/conf
+RUN mkdir $USER_HOME_DIR/deploy
 
 RUN mv $SCRIPT_DIR/*.sh $USER_HOME_DIR/bin
 RUN sed -i 's/-DSTOP.PORT=/-DSTOP.PORT=8506/g' $BASE_ENDECA_DIR/CAS/11.3.0/bin/cas-service.sh
@@ -190,6 +191,6 @@ RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
 ENV AUTHORIZED_KEYS **None**
 
-VOLUME ["/home/endeca/endeca/apps"]
+VOLUME ["/home/endeca/endeca/apps","/home/endeca/endeca/deploy"]
 EXPOSE 22 $CAS_PORT $WORKBENCH_PORT
 CMD ["/run.sh"]
