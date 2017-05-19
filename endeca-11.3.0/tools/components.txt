@@ -1,5 +1,4 @@
-V861198-01.zip - Oracle Commerce Content Acquisition System 11.3 for Linux
 V861206-01.zip - Oracle Commerce MDEX Engine 11.3 for Linux
-V861200-01.zip - Oracle Commerce Experience Manager Tools and Frameworks 11.3 for Linux
 V861203-01.zip - Oracle Commerce Guided Search Platform Services 11.3 for Linux
-
+V861200-01.zip - Oracle Commerce Experience Manager Tools and Frameworks 11.3 for Linux
+V861198-01.zip - Oracle Commerce Content Acquisition System 11.3 for Linux
