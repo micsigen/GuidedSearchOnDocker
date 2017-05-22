@@ -30,6 +30,8 @@ fi
 
 # sleep 2s
 
+# curl http://localhost:8006/ifcr
+
 # curl -FoldPwd=admin -FnewPwd=Oracleatg123 -FnewPwdConfirm=Oracleatg123 \
 # http://admin:admin@localhost:8006/ifcr/system/userManager/user/admin.changePassword.json
 
