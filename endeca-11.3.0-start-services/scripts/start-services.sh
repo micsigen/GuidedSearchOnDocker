@@ -28,9 +28,10 @@ fi
 /etc/init.d/cas start
 /etc/init.d/workbench start
 
-sleep 5
+# sleep 2s
 
-curl -FoldPwd=admin -FnewPwd=Oracleatg123 -FnewPwdConfirm=Oracleatg123 http://admin:admin@localhost:8006/ifcr/system/userManager/user/admin.changePassword.json
+# curl -FoldPwd=admin -FnewPwd=Oracleatg123 -FnewPwdConfirm=Oracleatg123 \
+# http://admin:admin@localhost:8006/ifcr/system/userManager/user/admin.changePassword.json
 
 # /bin/su endeca -c /home/endeca/bin/installDiscoverApp.sh
 
