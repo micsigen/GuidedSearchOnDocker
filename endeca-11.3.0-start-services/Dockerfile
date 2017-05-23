@@ -9,19 +9,19 @@ ENV SCRIPT_DIR /home/endeca/bin
 ENV CONF_DIR /home/endeca/conf
 
 ADD $LOCAL_SCRIPTS/*.sh $SCRIPT_DIR/
-ADD $LOCAL_CONF/*.txt $CONF_DIR/
+ADD $LOCAL_CONF/*.* $CONF_DIR/
 
 RUN chmod -R 755 $SCRIPT_DIR && \
     chmod +x $SCRIPT_DIR/*.sh && \
     chmod -R 755 $CONF_DIR
 
-RUN cp /home/endeca/bin/ps-init.d.sh /etc/init.d/ps
+RUN mv /home/endeca/bin/ps-init.d.sh /etc/init.d/ps
 RUN /sbin/chkconfig --add ps
 
-RUN cp /home/endeca/bin/cas-init.d.sh /etc/init.d/cas
+RUN mv /home/endeca/bin/cas-init.d.sh /etc/init.d/cas
 RUN /sbin/chkconfig --add cas
 
-RUN cp /home/endeca/bin/workbench-init.d.sh /etc/init.d/workbench
+RUN mv /home/endeca/bin/workbench-init.d.sh /etc/init.d/workbench
 RUN /sbin/chkconfig --add workbench
 
 USER endeca

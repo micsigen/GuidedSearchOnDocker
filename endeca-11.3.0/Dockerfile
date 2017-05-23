@@ -191,6 +191,6 @@ RUN rm -rf $BASE_TMP_PACKAGE_INSTALL
 
 ENV AUTHORIZED_KEYS **None**
 
-VOLUME ["/home/endeca/endeca/apps","/home/endeca/endeca/deploy"]
+VOLUME ["/home/endeca/endeca/apps"]
 EXPOSE 22 $CAS_PORT $WORKBENCH_PORT
 CMD ["/run.sh"]
