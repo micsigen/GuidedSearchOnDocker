@@ -3,6 +3,8 @@ MAINTAINER Balazs Major <majorbalu@gmail.com>
 
 USER root
 
+RUN yum -y install dos2unix
+
 ENV LOCAL_SCRIPTS scripts
 ENV LOCAL_CONF conf
 ENV SCRIPT_DIR /home/endeca/bin

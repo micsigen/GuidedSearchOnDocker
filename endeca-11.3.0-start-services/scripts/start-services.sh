@@ -38,7 +38,7 @@ sleep 5s
 curl -v -FoldPwd=admin -FnewPwd=Oracleatg123 -FnewPwdConfirm=Oracleatg123 \
 http://admin:admin@localhost:8006/ifcr/system/userManager/user/admin.changePassword.json
 
-/bin/su - endeca -c /home/endeca/bin/installDiscoverApp.sh
+# /bin/su - endeca -c /home/endeca/bin/installDiscoverApp.sh
 
 echo $'\n'
 echo "Container started successfully!"
