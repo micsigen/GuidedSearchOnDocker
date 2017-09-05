@@ -1,6 +1,6 @@
 # .gitignore
-endeca-11.3.0/tools/V861206-01.zip
-endeca-11.3.0/tools/V861198-01.zip
-endeca-11.3.0/tools/V861200-01.zip
-endeca-11.3.0/tools/V861203-01.zip
+endeca-11.3.0/tools/*
+endeca-11.0.0/tools/*
+endeca-11.1.0/tools/*
+endeca-11.2.0/tools/*
 build.log
