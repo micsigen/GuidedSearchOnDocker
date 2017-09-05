@@ -8,7 +8,8 @@ RUN yum -y install which && \
     yum -y install glibc.i686 && \
     yum -y install sudo && \
     yum -y install tar && \
-    yum -y install unzip.x86_64
+    yum -y install unzip.x86_64 && \
+    yum -y install dos2unix
 
 #######################################
 # environment variables
@@ -30,7 +31,7 @@ ENV BASE_ENDECA_DIR $USER_HOME_DIR/endeca
 # platform services silent install specific env variables
 ENV ENDECA_HTTP_SERVICE_PORT 8888
 ENV ENDECA_HTTP_SERVICE_SHUTDOWN_PORT 8090
-ENV ENDECA_MDEX_INSTALL_DIR $BASE_ENDECA_DIR/MDEX/6.5.0
+ENV ENDECA_MDEX_INSTALL_DIR $BASE_ENDECA_DIR/MDEX/6.5.1
 
 # CAS silent install specific env variables
 ENV CAS_PORT 8500
@@ -58,28 +59,28 @@ RUN chmod -R 755 $SCRIPT_DIR && \
 #######################################
 # start copying across all endeca packages
 #
-#mdex6.5.0-Linux64_781329REL.sh
-#presAPI_6.5.0.781329_x86_64pc-linux.tgz
-ADD $LOCAL_TOOLS/V43973-01.zip $BASE_TMP_PACKAGE_INSTALL/V43973-01.zip
+#OCmdex6.5.1-Linux64_829811.sh
+#OCpresAPI6.5.1-Linux64_829811.tgz
+ADD $LOCAL_TOOLS/V46002-01.zip $BASE_TMP_PACKAGE_INSTALL/V46002-01.zip
 
-#platformservices11.0.0-Linux64_781523REL.sh
-ADD $LOCAL_TOOLS/V43054-01.zip $BASE_TMP_PACKAGE_INSTALL/V43054-01.zip
+#OCplatformservices11.1.0-Linux64.bin
+ADD $LOCAL_TOOLS/V45999-01.zip $BASE_TMP_PACKAGE_INSTALL/V45999-01.zip
 
 #ToolsAndFrameworks
-ADD $LOCAL_TOOLS/V43065-01.zip $BASE_TMP_PACKAGE_INSTALL/V43065-01.zip
+ADD $LOCAL_TOOLS/V46389-01.zip $BASE_TMP_PACKAGE_INSTALL/V46389-01.zip
 
-#cas11.0.0-Linux64_173709REL.sh
-ADD $LOCAL_TOOLS/V43049-01.zip $BASE_TMP_PACKAGE_INSTALL/V43049-01.zip
+#OCcas11.1.0-Linux64.sh
+ADD $LOCAL_TOOLS/V46393-01.zip $BASE_TMP_PACKAGE_INSTALL/V46393-01.zip
 
 RUN chown -R endeca $BASE_TMP_ENDECA_INSTALL
 
 USER endeca
 #######################################
 # Unzip all packages to get install scripts and files
-RUN unzip $BASE_TMP_PACKAGE_INSTALL/V43973-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
-    unzip $BASE_TMP_PACKAGE_INSTALL/V43054-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
-    unzip $BASE_TMP_PACKAGE_INSTALL/V43065-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
-    unzip $BASE_TMP_PACKAGE_INSTALL/V43049-01.zip -d $BASE_TMP_ENDECA_INSTALL
+RUN unzip $BASE_TMP_PACKAGE_INSTALL/V46002-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
+    unzip $BASE_TMP_PACKAGE_INSTALL/V45999-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
+    unzip $BASE_TMP_PACKAGE_INSTALL/V46389-01.zip -d $BASE_TMP_ENDECA_INSTALL && \
+    unzip $BASE_TMP_PACKAGE_INSTALL/V46393-01.zip -d $BASE_TMP_ENDECA_INSTALL
 
 RUN chmod +x $BASE_TMP_ENDECA_INSTALL/*.*
 
@@ -87,14 +88,14 @@ RUN chmod +x $BASE_TMP_ENDECA_INSTALL/*.*
 # MDEX INSTALLATION FOLLOWS
 RUN echo USER_INSTALL_DIR=$USER_HOME_DIR > $BASE_TMP_ENDECA_INSTALL/mdex_response.properties
 
-RUN $BASE_TMP_ENDECA_INSTALL/mdex6.5.0-Linux64_781329REL.sh --target $USER_HOME_DIR
+RUN $BASE_TMP_ENDECA_INSTALL/OCmdex6.5.1-Linux64_829811.sh --target $USER_HOME_DIR
 
 # copy mdex environment variables to .bashrc
 RUN cat $ENDECA_MDEX_INSTALL_DIR/mdex_setup_sh.ini >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
 
 # set mdex environment variables for rest of install
-ENV ENDECA_MDEX_ROOT $BASE_ENDECA_DIR/MDEX/6.5.0
+ENV ENDECA_MDEX_ROOT $BASE_ENDECA_DIR/MDEX/6.5.1
 ENV PATH $ENDECA_MDEX_ROOT/bin:$PATH
 
 #######################################
@@ -112,19 +113,19 @@ RUN echo $ENDECA_HTTP_SERVICE_PORT >> $PS_SILENT_PATH && \
 RUN cat $PS_SILENT_PATH
 
 # install platform services
-RUN cat $PS_SILENT_PATH | $BASE_TMP_ENDECA_INSTALL/platformservices11.0.0-Linux64_781523REL.sh --target $USER_HOME_DIR
+RUN cat $PS_SILENT_PATH | $BASE_TMP_ENDECA_INSTALL/OCplatformservices11.1.0-Linux64.bin --target $USER_HOME_DIR
 
 # RUN ln -s $USER_HOME_DIR/endeca/PlatformServices/ $BASE_ENDECA_DIR/PlatformServices
 RUN cat $BASE_ENDECA_DIR/PlatformServices/workspace/setup/installer_sh.ini >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
 
 # set platform services variables for rest of install
-ENV VERSION 11.0.0
-ENV BUILD_VERSION 11.0.0
+ENV VERSION 11.1.0
+ENV BUILD_VERSION 11.1.0
 ENV ARCH_OS Linux64
 ENV PRODUCT IAP
 ENV ENDECA_INSTALL_BASE $BASE_DIR
-ENV ENDECA_ROOT $BASE_ENDECA_DIR/PlatformServices/11.0.0
+ENV ENDECA_ROOT $BASE_ENDECA_DIR/PlatformServices/11.1.0
 ENV PERLLIB $ENDECA_ROOT/lib/perl:$ENDECA_ROOT/lib/perl/Control:$ENDECA_ROOT/perl/lib:$ENDECA_ROOT/perl/lib/site_perl:$PERLLIB
 ENV PERL5LIB $ENDECA_ROOT/lib/perl:$ENDECA_ROOT/lib/perl/Control:$ENDECA_ROOT/perl/lib:$ENDECA_ROOT/perl/lib/site_perl:$PERL5LIB
 ENV PATH $ENDECA_ROOT/bin:$ENDECA_ROOT/perl/bin:$ENDECA_ROOT/utilities:$PATH
@@ -133,8 +134,8 @@ ENV ENDECA_CONF $BASE_ENDECA_DIR/PlatformServices/workspace
 #######################################
 # TOOLS AND FRAMEWORKS INSTALLATION FOLLOWS
 # set tools and frameworks variables for rest of install
-ENV ENDECA_TOOLS_ROOT $BASE_ENDECA_DIR/ToolsAndFrameworks/11.0.0
-ENV ENDECA_TOOLS_CONF $BASE_ENDECA_DIR/ToolsAndFrameworks/11.0.0/server/workspace
+ENV ENDECA_TOOLS_ROOT $BASE_ENDECA_DIR/ToolsAndFrameworks/11.1.0
+ENV ENDECA_TOOLS_CONF $BASE_ENDECA_DIR/ToolsAndFrameworks/11.1.0/server/workspace
 ENV TF_SILENT_SH_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_install.sh
 ENV TF_SILENT_RESP_PATH $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp
 
@@ -158,9 +159,9 @@ RUN echo $CAS_PORT >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt && \
     echo $CAS_HOST >> $BASE_TMP_ENDECA_INSTALL/cas-silent.txt
 
 #install CAS
-RUN cat $BASE_TMP_ENDECA_INSTALL/cas-silent.txt | $BASE_TMP_ENDECA_INSTALL/cas11.0.0-Linux64_173709REL.sh --target $USER_HOME_DIR --endeca_tools_root $ENDECA_TOOLS_ROOT --endeca_tools_conf $ENDECA_TOOLS_CONF
+RUN cat $BASE_TMP_ENDECA_INSTALL/cas-silent.txt | $BASE_TMP_ENDECA_INSTALL/OCcas11.1.0-Linux64.sh --target $USER_HOME_DIR --endeca_tools_root $ENDECA_TOOLS_ROOT --endeca_tools_conf $ENDECA_TOOLS_CONF
 
-RUN echo CAS_ROOT=$BASE_ENDECA_DIR/CAS/11.0.0 >> $USER_HOME_DIR/.bashrc
+RUN echo CAS_ROOT=$BASE_ENDECA_DIR/CAS/11.1.0 >> $USER_HOME_DIR/.bashrc
 RUN echo CAS_WORKSPACE=$BASE_ENDECA_DIR/CAS/workspace >> $USER_HOME_DIR/.bashrc
 RUN source $USER_HOME_DIR/.bashrc
 
@@ -172,7 +173,7 @@ RUN mkdir $USER_HOME_DIR/conf
 RUN mkdir $USER_HOME_DIR/deploy
 
 RUN mv $SCRIPT_DIR/*.sh $USER_HOME_DIR/bin
-RUN sed -i 's/-DSTOP.PORT=/-DSTOP.PORT=8506/g' $BASE_ENDECA_DIR/CAS/11.0.0/bin/cas-service.sh
+RUN sed -i 's/-DSTOP.PORT=/-DSTOP.PORT=8506/g' $BASE_ENDECA_DIR/CAS/11.1.0/bin/cas-service.sh
 
 RUN cp $BASE_TMP_ENDECA_INSTALL/cas-silent.txt $USER_HOME_DIR/conf/ && \
     cp $BASE_TMP_ENDECA_INSTALL/cd/Disk1/install/silent_response.rsp $USER_HOME_DIR/conf/ && \

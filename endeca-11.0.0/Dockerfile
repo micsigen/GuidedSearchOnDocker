@@ -8,7 +8,8 @@ RUN yum -y install which && \
     yum -y install glibc.i686 && \
     yum -y install sudo && \
     yum -y install tar && \
-    yum -y install unzip.x86_64
+    yum -y install unzip.x86_64 && \
+    yum -y install dos2unix
 
 #######################################
 # environment variables
